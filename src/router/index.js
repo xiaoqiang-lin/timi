@@ -1,15 +1,37 @@
+// 1. 引入
 import Vue from 'vue'
-import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
+import VueRouter from 'vue-router'
 
-Vue.use(Router)
+import Home from '../pages/Home/Home'
+import Recommend from '../pages/Recommend/Recommend'
+import Search from '../pages/Search/Search'
+import Chat from '../pages/Chat/Chat'
+import Mine from '../pages/Mine/Mine'
 
-export default new Router({
-  routes: [
-    {
-      path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
-    }
-  ]
-})
+// 2. 声明使用
+Vue.use(VueRouter);
+
+export default new VueRouter({
+    routes: [
+        {
+            path: '/home',
+            component: Home,
+        },
+        {
+            path: '/recommend',
+            component: Recommend
+        },
+        {
+            path: '/search',
+            component: Search
+        },
+        {
+            path: '/chat',
+            component: Chat
+        },
+        {
+            path: '/Mine',
+            component: Mine
+        }
+    ]
+});
