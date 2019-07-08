@@ -1,24 +1,24 @@
 <template>
-  <div class="tabBar">
+  <div class="tabBar" v-show="this.$route.meta.showTabBar">
       <div class="tabBar-item" @click="jumpTo('/home')">
-          <span class="iconfont" :class="{active:$route.path=='/home'}">&#xe607;</span>
-          <span :class="{active:$route.path=='/home'}">首页</span>
+          <span class="iconfont" :class="{active:$route.path.includes('/home')}">&#xe607;</span>
+          <span :class="{active:$route.path.includes('/home')}">首页</span>
       </div>
       <div class="tabBar-item" @click="jumpTo('/recommend')">
-          <span class="iconfont" :class="{active:$route.path=='/recommend'}">&#xe635;</span>
-          <span :class="{active:$route.path=='/recommend'}">推荐</span>
+          <span class="iconfont" :class="{active:$route.path.includes('/recommend')}">&#xe635;</span>
+          <span :class="{active:$route.path.includes('/recommend')}">推荐</span>
       </div>
       <div class="tabBar-item"  @click="jumpTo('/search')">
-          <span class="iconfont" :class="{active:$route.path=='/search'}">&#xe60b;</span>
-          <span  :class="{active:$route.path=='/search'}">搜索</span>
+          <span class="iconfont" :class="{active:$route.path.includes('/search')}">&#xe60b;</span>
+          <span  :class="{active:$route.path.includes('/search')}">搜索</span>
       </div>
       <div class="tabBar-item" @click="jumpTo('/chat')">
-          <span class="iconfont" :class="{active:$route.path=='/chat'}">&#xe60f;</span>
-          <span :class="{active:$route.path=='/chat'}">聊天</span>
+          <span class="iconfont" :class="{active:$route.path.includes('/chat')}">&#xe60f;</span>
+          <span :class="{active:$route.path.includes('/chat')}">聊天</span>
       </div>    
       <div class="tabBar-item" @click="jumpTo('/mine')">
-          <span class="iconfont" :class="{active:$route.path=='/mine'}">&#xe608;</span>
-          <span :class="{active:$route.path=='/mine'}">我的</span>
+          <span class="iconfont" :class="{active:$route.path.includes('/mine')}">&#xe608;</span>
+          <span :class="{active:$route.path.includes('/mine')}">我的</span>
       </div>
   </div>
 </template>

@@ -7,7 +7,6 @@
 
 <script>
   import TabBar from './components/TabBar/TabBar'
-  import 'common/css/iconfont.css'
   export default {
     name: "App",
     components: {
