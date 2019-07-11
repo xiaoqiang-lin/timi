@@ -225,19 +225,15 @@ src
 
 ```javascript
 import axios from 'axios';
-
-const BASE_URL = 'http://127.0.0.1:1688';
-
+const BASE_URL = 'http://127.0.0.1:3000';
 export function getSwipeImgs () {
-    return axios.get(BASE_URL + '/api/homecasual');
+    return axios.get(BASE_URL + '/api/carouselimgs');
 }
-
 export function getBannerNavData(){
-	return axios.get(BASE_URL + '/api/homenav');
+	return axios.get(BASE_URL + '/api/bannernav');
 }
-
 export function getShopListData(){
-	return axios.get(BASE_URL + '/api/homeshoplist');
+	return axios.get(BASE_URL + '/api/homegoods');
 }
 
 ```
@@ -501,20 +497,21 @@ export function getShopListData(){
 
 ```html
 <template>
-  <div class="banner-nav">
-    <div class="banner-wrapper">
-      <div class="banner-content">
-        <div class="banner-item" v-for="(item,index) in navItems" :key="index">
-          <a href="">
-            <img :src="item.iconurl" alt="">
-			<span>{{item.icontitle}}</span>
-          </a>
+  <div class="icons">
+    <swiper :options="swiperOption">
+      <swiper-slide v-for="(page, index) of pages" :key="index">
+        <div
+          class="icon"
+          v-for="item of page"
+          :key="item.id"
+        >
+          <div class='icon-img'>
+            <img class='icon-img-content' :src='item.imgUrl' />
+          </div>
+          <p class="icon-desc">{{item.desc}}</p>
         </div>
-      </div>
-      <div class="banner-indicator-wrapper">
-		<div class="banner-indicator"></div>
-	  </div>
-    </div>
+      </swiper-slide>
+    </swiper>
   </div>
 </template>
 ```
@@ -522,52 +519,40 @@ export function getShopListData(){
 
 
 ```css
-// css
-<style lang='stylus'  ref='stylesheet/stylus' scoped>
-.banner-nav
-	position relative
-	width 100%
-	height 180px
-	overflow-x scroll
-	background-color #fff
-	padding-bottom 10px
-	.banner-wrapper
-		width 720px
-		height 100%
-		.banner-content
-			ul
-				.banner-item
-					width 90px
-					height 90px
-					display inline-flex
-					flex-direction column
-					font-size 14px
-					align-items center
-					justify-content center
-					color #666666
-					img
-						width 40%
-						margin-bottom 5px
-					span
-						text-align center
-	.banner-indicator-wrapper
-		width 100px
-		height 2px
-		background-color red
-		opacity 0.3
-		position absolute
-		left 50%
-		margin-left -50px
-		bottom 8px
-		.banner-indicator
-			position absolute
-			left 0
-			height 100%
-			background-color orangered
-			width 0px
-.banner-nav::-webkit-scrollbar 
-	display none
-</style>
+ .icons >>> .swiper-container
+    height: 0
+    padding-bottom: 50%
+  .icons
+    margin-top: .1rem
+    .icon
+      position: relative
+      overflow: hidden
+      float: left
+      width: 25%
+      height: 0
+      padding-bottom: 25%
+      .icon-img
+        position: absolute
+        top: 0
+        left: 0
+        right: 0
+        bottom: .44rem
+        box-sizing: border-box
+        padding: .1rem
+        .icon-img-content
+          display: block
+          margin: 0 auto
+          height: 100%
+      .icon-desc
+        position: absolute
+        left: 0
+        right: 0
+        bottom: 0
+        height: .44rem
+        line-height: .44rem
+        text-align: center
+        color: $darkTextColor
+        ellipsis()
 ```
 
 ##### `js`逻辑
@@ -642,25 +627,6 @@ export function getShopListData(){
   }
   
   ```
-
-### 广告位
-
-广告位只是一张图片。
-
-```html
-<div class="hot-ad">
-    <a>
-    	<img src=" " width="100%"">
-    </a>
-</div>                                 
-```
-
-```css
-.hot-ad
-	bgc #fff
-    margin 8px 0
-	padding 5px
-```
 
 ### 首页拼单商品展示
 
@@ -746,6 +712,20 @@ export function getShopListData(){
 ```
 
 
+
+首页`bug`修复
+
+从下面图中，可以发现存在明显的抖动现象。原因
+
+![home-bug](E:\Timi\vue\timi\screen\home_bug.gif)
+
+修改后
+
+![](E:\Timi\vue\timi\screen\home_bug_fixed.gif)
+
+细心观察后，发现`bannernav`也存在抖动现象。
+
+![1562662941793](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1562662941793.png)
 
 ## 花生壳内网穿透（未知，待解决）
 
@@ -849,13 +829,13 @@ export default {
 
 ## 三、推荐页面开发
 
-推荐页面使用`vue-waterfall-easy`实现瀑布流布局
+推荐页面使用`better-scroll`实现瀑布流布局
 
-[vue-waterfall-easy的github地址](https://github.com/lfyfly/vue-waterfall-easy/blob/master/README-CN.md)
+[better-scroll](https://ustbhuangyi.github.io/better-scroll/doc/zh-hans/installation.html#npm)
 
-1. 安装`vue-waterfall-easy`
+1. 安装`better-scroll`
 
-   `npm install vue-waterfall-easy --save-dev`
+   ``
 
 2. 数据获取
 
@@ -901,6 +881,10 @@ router.get('/api/recommendShopList',(req,res) =>{
 
 7. 前端访问路径的路由参数在`data`中进行处理
 
+![1562595126560](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1562595126560.png)
+
+已实现`下拉刷新`和`上拉加载`
+
 **知识捡漏**
 
 `margin`和`padding`
@@ -909,7 +893,27 @@ router.get('/api/recommendShopList',(req,res) =>{
 Failed to mount component: template or render function not defined.
 ```
 
+**推荐页面细节修复**
 
+从效果图中，可以发现项目中出现大量的图片，而图片的加载是耗时耗流量的，为了提高用户体验，使用图片懒加载。
+
+加载中图片
+
+![](E:\Timi\vue\timi\src\common\images\loading.gif)
+
+
+
+加载失败图片
+
+![](E:\Timi\vue\timi\src\common\images\error.jpg)
+
+[vue图片懒加载lazy-load](https://blog.csdn.net/qq_43077894/article/details/83544432)
+
+在使用`vue-lazyload`插件时，要注意图片的路径。
+
+实现效果如下：
+
+![lazy-load](E:\Timi\vue\timi\screen\lazy-load.gif)
 
 ## 四、搜索页面开发
 
@@ -1653,8 +1657,163 @@ validatePhoneNumber(){
    server -->验证码服务商-->client
 
 5. 
+
 6. 使用`mint-ui`
+
+   `npm install babel-plugin-component -D`
+
+   ```json
+   {
+     "presets": [
+       ["env", {
+         "modules": false,
+         "targets": {
+           "browsers": ["> 1%", "last 2 versions", "not ie <= 8"]
+         }
+       }],
+       "stage-2"
+     ],
+     "plugins": ["transform-vue-jsx", "transform-runtime", ["component", [
+       {
+         "libraryName": "mint-ui",
+         "style": true
+       }
+     ]]]
+   }
+   ```
+
+   
+
 7. `postMan`
+
+六、 实现加载动画
+
+```html
+<div class="loading">
+	<div class="loader"></div>
+</div>
+
+<div class="box">
+  loader-01
+  <div class="loader-01">
+  </div>
+</div>
+
+body {
+  background: -webkit-radial-gradient(ellipse farthest-corner at center bottom, #69d2fb 0%, #20438e 100%) center bottom/100% fixed;
+  background: radial-gradient(ellipse farthest-corner at center bottom, #69d2fb 0%, #20438e 100%) center bottom/100% fixed;
+  text-align: center;
+  box-sizing: border-box;
+  font-family: sans-serif;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+body *,
+body *:before,
+body *:after {
+  box-sizing: inherit;
+}
+
+body:hover > * {
+  opacity: .5;
+}
+.box {
+  display: inline-block;
+  width: 200px;
+  height: 200px;
+  border: 1px solid currentcolor;
+  border-radius: 3px;
+  font-size: 30px;
+  padding: 1em;
+  position: relative;
+  margin-bottom: .25em;
+  vertical-align: top;
+  -webkit-transition: .3s color, .3s border, .3s transform, .3s opacity;
+  transition: .3s color, .3s border, .3s transform, .3s opacity;
+}
+
+.box:hover {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.1);
+  font-size: 0;
+  padding: 0;
+  border-width: 3px;
+  line-height: 200px;
+  opacity: 1;
+  -webkit-transform: scale(1.2);
+  transform: scale(1.2);
+  z-index: 2;
+}
+
+.box:hover [class*="loader-"] {
+  font-size: 70px;
+  line-height: 200px;
+}
+
+[class*="loader-"] {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  color: inherit;
+  vertical-align: middle;
+  pointer-events: none;
+}
+
+.loader-14 {
+  border-radius: 50%;
+  box-shadow: 0 1em 0 -.2em currentcolor;
+  position: relative;
+  -webkit-animation: loader-14 0.8s ease-in-out alternate infinite;
+  animation: loader-14 0.8s ease-in-out alternate infinite;
+  -webkit-animation-delay: 0.32s;
+  animation-delay: 0.32s;
+  top: -1em;
+}
+
+.loader-14:after,
+.loader-14:before {
+  content: '';
+  position: absolute;
+  width: inherit;
+  height: inherit;
+  border-radius: inherit;
+  box-shadow: inherit;
+  -webkit-animation: inherit;
+  animation: inherit;
+}
+
+.loader-14:before {
+  left: -1em;
+  -webkit-animation-delay: 0.48s;
+  animation-delay: 0.48s;
+}
+
+.loader-14:after {
+  right: -1em;
+  -webkit-animation-delay: 0.16s;
+  animation-delay: 0.16s;
+}
+
+@-webkit-keyframes loader-14 {
+  0% {
+    box-shadow: 0 2em 0 -.2em currentcolor;
+  }
+  100% {
+    box-shadow: 0 1em 0 -.2em currentcolor;
+  }
+}
+
+@keyframes loader-14 {
+  0% {
+    box-shadow: 0 2em 0 -.2em currentcolor;
+  }
+  100% {
+    box-shadow: 0 1em 0 -.2em currentcolor;
+  }
+}
+```
+
+
 
 **知识捡漏**
 
@@ -1670,6 +1829,177 @@ validatePhoneNumber(){
 
 102 // 数据插入失败
 
+![1562589982592](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1562589982592.png)
+
+![1562590021308](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1562590021308.png)
+
+![1562590046334](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1562590046334.png)
+
+
+
+![1562590185606](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1562590185606.png)
+
+
+
+**知识捡漏**
+
+1. 对于`flex`布局的容器
+
+   ```html
+   <div class="mine-header">
+         <img src="./../../common/images/me_icon.png" alt="" class="avatar">
+         <span>157*****0141</span>
+         <i class="iconfont">&#xe631;</i>
+       </div>
+       <h4 class="title">我的订单</h4>
+       <div class="order">
+         <span class="order-item">
+           <span class="iconfont">&#xe626;</span>
+           <span class="item-desc">待付款</span>
+         </span>
+         <span class="order-item">
+           <span class="iconfont">&#xe604;</span>
+           <span class="item-desc">待发货</span>
+         </span>
+         <span class="order-item">
+           <span class="iconfont">&#xe609;</span>
+           <span class="item-desc">待收货</span>
+         </span>
+         <span class="order-item">
+           <span class="iconfont">&#xe628;</span>
+           <span class="item-desc">待评价</span>
+         </span>
+         <span class="order-item">
+           <span class="iconfont">&#xe603;</span>
+           <span class="item-desc">待分享</span>
+         </span>
+       </div>
+   ```
+
+   ```css
+   <style lang='stylus'  ref='stylesheet/stylus' scoped>
+   .mine 
+     width 100%
+     height 100%
+     background-color #f5f5f5
+     font-size 14px
+     .mine-header
+       background-color #fff
+       display flex
+       height 50px
+       align-items center
+       padding 20px
+       margin-bottom 10px
+       .avatar
+         border-radius 50%
+         width 60px
+         height 60px
+     .order
+       background-color #fff
+       display flex
+       .order-item
+         flex 1
+         height 60px
+         width 60px
+   </style>
+   ```
+
+   ![1562642444913](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1562642444913.png)
+
+六、个人中心页面开发
+
+`UI`界面
+
+![1562660368442](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1562660368442.png)
+
+![1562660416596](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1562660416596.png)
+
+![1562660465886](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1562660465886.png)
+
+**知识捡漏**
+
+在`vue`中使用过滤器
+
+```javascript
+需求将`1311111111`类型的电话号码字符串过滤成`131****1111`
+
+```
+
+**安装`moment`插件格式化时间**
+
+细节处理
+
+1.当用户打开`app`的时候，就去服务器获取用户信息
+
+
+
+登录`bug`
+
+![](E:\Timi\vue\timi\screen\login_bug.gif)
+
+从上面图中，可以发现存在两个`bug`,
+
+一个是`login`后，刷新我的页面时存在闪现现象。
+
+一个是在`mine`页面刷新后，需要重新登录。
+
+出现闪现问题的原因：
+
+​	1.在`vue`中，使用`v-if`和`v-else-if`和`v-else`时，页面会先加载，然后再根据条件判断选择隐藏还是显示。
+
+`v-cloak`的作用是可以隐藏为未编译的`Mustache`标签和变量直到数据渲染完成。
+
+解决办法：
+
+```html
+<div v-if="userInfo.id" v-cloak>
+<un-login v-else v-cloak></un-login>
+```
+
+`css`
+
+```css
+  [v-cloak]
+    display none !important  // 加入!important 是为了导致样式被更高层级的选择器覆盖，导致样式失效
+```
+
+![](E:\Timi\vue\timi\screen\flick_bug_fiexed.gif)
+
+刷新问题的原因：
+
+ * 路由刷新
+
+   路由刷新是无刷新跳转，表面看起来就像是一个`app`应用，表现效果类似于`tab`选项卡，所有的数据都还存在内存里，页面是无重载的。
+
+* `F5`刷新
+
+  `F5`刷新时，会销毁之前所有的数据，然后重新加载页面。因此卸载生命周期里的`vuex`数据是重新初始化，无法获取的。
+
+  [Vue | 在vue中使用session Storage和vuex保存用户登录状态](https://www.jianshu.com/p/b2b634c77502)
+
+   思路如下：
+
+    		1. 在`login.vue`文件中，在登录成功后，设置`sessionStorage.setItem("userInfo",this.userInfo)`
+      		2. 当刷新`mine`时，首先从`sessionStorage.getItem("userInfo")`然后同步到`vuex`中
+
+`sessionStorage`的使用采坑
+
+1. `sessionStorage.setItem("userInfo",this.userInfo)`在这里`this.userInfo`是一个对象，取值时，我们发现无法通过`sessionStorage.getItem("userInfo").id`的方法来获取值。
+
+2. 查阅资料后发现`sessionStorage`和`localStorage` 在存储对象时,会将对象转换成字符串。
+
+3. 因此，
+
+
+
+购物车编辑功能实现
+
+`ui`
+
+![1562590233528](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1562590233528.png)
+
+
+
 ## 参考链接
 
 [在vue项目中使用iconfont ](https://www.imooc.com/article/33597?block_id=tuijian_wz)
@@ -1682,3 +2012,8 @@ https://www.jianshu.com/p/f3df4ffe3301
 
 172.17.8.100
 
+字体图标在这里
+
+D:\download\font_1268908_boclunf6d7v
+
+[左滑删除](https://www.helloweba.net/javascript/607.html)
