@@ -1,12 +1,14 @@
 <template>
   <div class="hot">
 	<!-- 轮播图 -->
-	<swiper :options="swiperOption" class="carousel" v-if="swiperSlides.length">
-		<swiper-slide v-for="item in swiperSlides" :key="item.id">
-			<img :src="item.imgurl" width="100%">
-		</swiper-slide>
-		<div class="swiper-pagination" slot="pagination"></div>
-  </swiper>
+	<div class="wrapper">
+		<swiper :options="swiperOption" class="carousel" v-if="swiperSlides.length">
+			<swiper-slide v-for="item in swiperSlides" :key="item.id">
+					<img :src="item.imgurl" width="100%">
+			</swiper-slide>
+			<div class="swiper-pagination" slot="pagination"></div>
+		</swiper>
+	</div>
 	<banner-nav></banner-nav>
 	<shop-list></shop-list>
   </div>
@@ -45,18 +47,20 @@
 		mounted(){	
 			getSwipeImgs().then((val)=>{
 				this.swiperSlides = val.data.message
-				console.log(val.data.message)
 			})
 		}
 	}
 
 </script>
 <style lang='stylus'  ref='stylesheet/stylus' scoped>
-
 .hot
 	overflow-x hidden !important
 	width 100%
 	height 100%
 	padding-top 42px
 	background #f5f5f5
+	.wrapper
+		width:100%
+		height:0
+		padding-bottom:38%
 </style>

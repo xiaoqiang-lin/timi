@@ -6,9 +6,11 @@ import VueRouter from 'vue-router'
 import Home from '../pages/Home/Home'
 import Recommend from '../pages/Recommend/Recommend'
 import Search from '../pages/Search/Search'
-import Chat from '../pages/Chat/Chat'
+import Cart from '../pages/Cart/Cart'
 import Mine from '../pages/Mine/Mine'
 import Login from '../pages/Login/Login'
+import Setting from '../pages/Mine/Children/Setting'
+import MineDetail from '../pages/Mine/Children/MineDetail'
 // 引入二级路由
 import Hot from '../pages/Home/Children/Hot/Hot'
 import Box from '../pages/Home/Children/Box'
@@ -19,7 +21,6 @@ import General from '../pages/Home/Children/General'
 import Man from '../pages/Home/Children/Man'
 import Mbaby from '../pages/Home/Children/Mbaby'
 import Shirt from '../pages/Home/Children/Shirt'
-
 // 2. 声明使用
 Vue.use(VueRouter);
 
@@ -52,14 +53,14 @@ export default new VueRouter({
             meta: {showTabBar: true}
         },
         {
-            path: '/chat',
-            component: Chat,
+            path: '/cart',
+            component: Cart,
             meta: {showTabBar: true}
         },
         {
             path: '/mine',
             component: Mine,
-            meta: {showTabBar: true}
+            meta: {showTabBar: true},
         },
         {
             path: '/',
@@ -68,6 +69,15 @@ export default new VueRouter({
         {
             path: '/login',
             component: Login,
-        }
+        },
+        {
+            path: '/setting',
+            component: Setting
+        },
+        {
+            path: '/detail',
+            component: MineDetail
+        },
+
     ]
 });

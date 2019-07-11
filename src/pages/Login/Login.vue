@@ -48,7 +48,8 @@
 
 <script>
 import {getPIN,loginBySms,loginByPwd} from 'dao/login';
-import {mapGetters, mapActions} from 'vuex'
+import {mapGetters,mapActions,mapMutations} from 'vuex'
+
 import {Toast} from 'mint-ui';
 export default {
   data () {
@@ -60,25 +61,26 @@ export default {
       isCypher: true,
       username:'',
       password:'',
-      captcha:''
+      captcha:'',
+      userInfo:{}
     };
+  },
+  mounted(){
+    console.log('这是来自login')
+    console.log(this.userInfo)
   },
   computed: {
     validTelNum(){
       return /^1[34578]\d{9}$/.test(this.telNum)
     },
-    ...mapGetters(['userInfo'])
   },
-  mounted () {
-    this.getUserInfo();
-    
-  },
-
   methods: {
     ...mapActions([
-      'getUserInfo',
       'syncUserInfo'
     ]),
+    ...mapMutations({
+      'setLoginState':'SET_LOGIN_STATE'
+    }),
     switchLoginMode(){
       this.flag=!this.flag
     },
@@ -95,9 +97,10 @@ export default {
           }
         },1000)
       }
-      const result = await getPIN(this.telNum);
+      let result = await getPIN(this.telNum);
+      result=result.data;
       console.log(result)
-      if(result.code==0){
+      if(result.err_code==0){
         Toast({
             message: result.message,
             position: 'center',
@@ -124,14 +127,13 @@ export default {
           Toast('请输入验证码!');
           return;
         }else if(!(/^\d{6}$/gi.test(this.code))){
-          Toast('请输入正确的验证码!');
+          Toast('请输入正确的短信验证码!');
           return;
         }
-
-        const result = await loginBySms({tel:this.telNum,code:this.code})
-        console.log(result)
-        if(result.code==200){
-          this.userInfo = result.data.message;
+        let result = await loginBySms({tel:this.telNum,code:this.code})
+        result = result.data;
+        if(result.success_code==200){
+          this.userInfo = result.message
         }else{
           this.userInfo = {
             message: '登录失败, 手机号码或验证码不正确!'
@@ -148,16 +150,26 @@ export default {
             Toast('请输入验证码!');
             return;
           }
-        const result = await loginByPwd({username:this.username,pwd:this.password, captcha:this.captcha});
-        console.log(result)
-          if (result.code === 200) {
-             this.userInfo = result.data.message;
+        let result = await loginByPwd({username:this.username,pwd:this.password, captcha:this.captcha});
+        result = result.data
+          if (result.success_code === 200) {
+             this.userInfo = result.message;
            } else {
              this.userInfo = {
                message: '登录失败, 用户名和密码不正确!'
              }
-             Toast('登录失败, 手机号码或验证码不正确!')
            }
+      }
+      if(!this.userInfo.id){
+          Toast(this.userInfo.message);
+      }else {
+          // 6.1 同步用户的信息
+          this.syncUserInfo(this.userInfo);
+          this.setLoginState(true)
+          sessionStorage.setItem("userInfo",JSON.stringify(this.userInfo))
+          sessionStorage.setItem("isLogin",true)
+          // 6.2 回到主界面
+          this.$router.back();
       }
     }
   }

@@ -13,5 +13,12 @@ export function loginByPwd(params){
   return axios.post(`${BASE_URL}/api/pwdlogin`,params)
 }
 export function getUserInfo(){
-  return axios.get(`${BASE_URL}/api/userinfo/`)
+  return axios.get(`${BASE_URL}/api/userinfo`)
+}
+export function logout(){
+  sessionStorage.clear();
+  return axios.get(`${BASE_URL}/api/logout`)
+}
+export function modifyUserInfo(params){
+  return axios.post(`${BASE_URL}/api/modifyuserinfo`,params)
 }

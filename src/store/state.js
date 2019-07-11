@@ -1,4 +1,4 @@
-const state = {
-  userInfo:{}
+export default {
+  userInfo: {},
+  isLogin:false
 }
-export default state;

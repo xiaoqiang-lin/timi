@@ -7,10 +7,21 @@
 
 <script>
   import TabBar from './components/TabBar/TabBar'
+  import { mapActions } from 'vuex'
   export default {
     name: "App",
     components: {
       TabBar
+    },
+    created(){
+      this.syncUserInfo(JSON.parse(sessionStorage.getItem("userInfo")))
+      this.fetchUserInfo()
+    },
+    methods:{
+      ...mapActions([
+        'syncUserInfo',
+        'fetchUserInfo'
+      ])
     }
   }
 </script>

@@ -1,83 +1,58 @@
 <template>
 	<div class="banner-nav">
-		<div class="banner-wrapper">
-			<div class="banner-content">
+		<swiper :options="swiperOption" class="banner-wrapper">
+			<swiper-slide v-for="(page, index) of pages" :key="index" class="banner-content">
 				<ul>
-					<li class="banner-item" v-for="(item,index) in navItems" :key="index">
-							<img :src="item.iconurl" alt="">
+					<li class="banner-item" v-for="(item,index) in page" :key="index">
+							<div class="img-wrapper">
+								<img :src="item.iconurl" alt="" width="100%">
+							</div>
 							<span>{{item.icontitle}}</span>
 					</li>
 				</ul>
-			</div>
-		</div>
-		<div class="banner-indicator-wrapper">
-				<div class="banner-indicator" :style="indicatorStyle"></div>
-		</div>
+			</swiper-slide>
+			<div class="swiper-pagination" slot="pagination"></div>
+		</swiper>
 	</div>
 </template>
 
 <script>
 import {getBannerNavData} from 'dao/home'
+import { swiper, swiperSlide } from 'vue-awesome-swiper'
+import 'swiper/dist/css/swiper.css'
 export default {
 	name: 'BannerNav',
-  data () {
-    return {
+	data () {
+		return {
 			navItems: [],
-			screenWidth: window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
-			scrollContentWidth: 720,
-			scroolBarWidth: 100,
-			actionBarWidth: 0,
-			x0: 0,
-			realStep: 0,
-			actionBarStep: 0,
-			endFlag: 0
-	};
-  },
-
-  components: {
-  },
-
-  computed: {
-		indicatorStyle(){
-			return {
-				width: `${this.getActionBarWidth}px`,
-				left: `${this.actionBarStep}px`
-			}
+			swiperOption: {
+				autoplay: false,
+			},
+			
 		}
-  },
-
-  mounted () {
-		this.bindEvent()
-		this.getActionBarWidth()
-		getBannerNavData().then((val) => {
+	},
+	computed: {
+		pages () {
+			const pages = []
+			this.navItems.forEach((item, index) => {
+				const page = Math.floor(index / 8)
+				if (!pages[page]) { //将pages里面的元素声明为数组
+					pages[page] = []
+				}
+				pages[page].push(item)
+			})
+			return pages
+		}
+	},
+	mounted(){	
+		getBannerNavData().then((val)=>{
 			this.navItems = val.data.message
-			console.log(val)
 		})
-  },
-
-  methods: {
-		bindEvent(){
-			this.$el.addEventListener('touchstart',this.handleTouchStart,false);
-			this.$el.addEventListener('touchmove',this.handleTouchMove,false);
-			this.$el.addEventListener('touchend',this.handleTouchEnd,false);
-		},
-		getActionBarWidth(){
-			this.actionBarWidth = this.scroolBarWidth * (this.screenWidth / this.scrollContentWidth)
-		},
-		handleTouchStart(event){
-			let touch = event.touches[0];
-			this.x0 = parseInt(touch.pageX);
-		},
-		handleTouchMove(event){
-			let touch = event.touches[0];
-			this.realStep = parseInt(touch.pageX) -this.x0;
-			this.actionBarStep = (this.scroolBarWidth / this.screenContentWidth * this.realStep)
-		},
-		handleTouchEnd(){
-			console.log('-------------')
-			this.translation = this.barMoveWidth;
-		},
-  }
+	},
+	components: {
+		swiper,
+		swiperSlide
+	},
 }
 
 </script>
@@ -90,10 +65,15 @@ export default {
 	background-color #fff
 	padding-bottom 10px
 	.banner-wrapper
-		width 720px
+		width 100%
 		height 100%
 		.banner-content
+			width 100%
+			display flex
+			justify-content center
+			align-items center
 			ul
+				width 90%
 				.banner-item
 					width 90px
 					height 90px
@@ -103,26 +83,11 @@ export default {
 					align-items center
 					justify-content center
 					color #666666
-					img
+					.img-wrapper
 						width 40%
+						height 0
+						padding-bottom 40%
 						margin-bottom 5px
 					span
 						text-align center
-	.banner-indicator-wrapper
-		width 100px
-		height 2px
-		background-color red
-		opacity 0.3
-		position absolute
-		left 50%
-		margin-left -50px
-		bottom 8px
-		.banner-indicator
-			position absolute
-			left 0
-			height 100%
-			background-color orangered
-			width 0px
-.banner-nav::-webkit-scrollbar 
-	display none
 </style>

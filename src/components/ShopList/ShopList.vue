@@ -37,7 +37,8 @@ export default {
 
 	mounted () {
 		getShopListData().then((val) => {
-			this.shopList = val.data.message
+			this.shopList = val.data.message.goods_list
+			console.log('=======================')
 			console.log(this.shopList)
 		})
 	},
@@ -103,4 +104,5 @@ export default {
 						margin-left 10px
 						background-color red
 						border-radius 8px
+						margin-right 8px
 </style>

@@ -1,42 +1,71 @@
 <template>
   <div class="recommend">
-    <vue-waterfall-easy :imgsArr="goodsList">
-      <!-- <goods-cell :item="item" v-for="item in goodsList" :key="item.goods_id"></goods-cell> -->
-        <a class="goods-cell" slot-scope="item">
-    <img :src="item.thumb_url" alt=""  v-if="props.thumb_url">
-    <h4 class="item-title">{{props.short_name}}</h4>
-    <div class="item-bottom">
-      <span class="item-price">¥{{props.price / 100}}</span>
-      <span class="item-sales">{{props.sales_tip}}</span>
-      <button class="item-btn">找相关</button>
-    </div>
-  </a>
-    </vue-waterfall-easy>
+    <ul>
+      <goods-showcase :item="item" v-for="(item,index) in goodsList" :key="item.goods_id+index" class="recommend-item"></goods-showcase>
+    </ul>
   </div>
 </template>
 
 <script>
   import {getRecommendData} from 'dao/recommend'
-  import GoodsCell from 'components/GoodsCell/GoodsCell'
-  import vueWaterfallEasy from 'vue-waterfall-easy'
+  import GoodsShowcase from 'components/GoodsShowcase/GoodsShowcase'
+  import BScroll from 'better-scroll';
+  import {mapActions} from 'vuex'
   export default {
     name: "Recommend",
     data(){
       return {
-        goodsList: []
+        goodsList: [],
+        page: 1,
+        count: 10
       }
     },
     components: {
-      GoodsCell,
-      vueWaterfallEasy
+      GoodsShowcase,
     },
     mounted (){
-      getRecommendData().then((val) => {
+      getRecommendData(this.page,this.count).then((val) => {
         this.goodsList = val.data.message
-        console.log(val.data.message)
+      }),
+      this.syncUserInfo(JSON.parse(sessionStorage.getItem("userInfo")))
+    },
+    methods:{
+      ...mapActions([
+        'syncUserInfo'
+      ]),
+      _initBScroll() {
+      this.scrollView= new BScroll('.recommend', {
+        scrollY: true,
+        probeType: 3
+      });
+      this.scrollView.on('touchEnd', (pos) => {
+        if(pos.y > 50){
+          getRecommendData(this.page,this.count).then((val) => {
+            this.goodsList = val.data.message
+          })
+        }
+        if(pos.y < this.scrollView.maxScrollY - 20){
+          getRecommendData(this.page,this.count).then((val) => {
+            this.goodsList = this.goodsList.concat(val.data.message)
+          })
+        }
       })
+      this.scrollView.on('scrollEnd', () => {
+        this.scrollView.refresh();
+      });
+    },
+  },
+    watch:{
+      goodsList() {
+        this.$nextTick(() => {
+          // 让当前的页码+1
+          this.page += 1;
+          // 初始化
+          this._initBScroll();
+        })
+      }
     }
-  }
+}
 </script>
 
 <style lang="stylus" ref="stylesheet/stylus">
@@ -44,4 +73,11 @@
     background #F5F5F5
     width 100%
     height 100%
+    overflow hidden
+    .recommend-item
+      display flex
+      flex-direction row
+      flex-wrap wrap
+      background #F5F5F5
+      padding-bottom 50px
 </style>

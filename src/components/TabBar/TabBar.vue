@@ -1,5 +1,5 @@
 <template>
-  <div class="tabBar" v-show="this.$route.meta.showTabBar">
+  <div class="tabBar">
       <div class="tabBar-item" @click="jumpTo('/home')">
           <span class="iconfont" :class="{active:$route.path.includes('/home')}">&#xe607;</span>
           <span :class="{active:$route.path.includes('/home')}">首页</span>
@@ -12,9 +12,9 @@
           <span class="iconfont" :class="{active:$route.path.includes('/search')}">&#xe60b;</span>
           <span  :class="{active:$route.path.includes('/search')}">搜索</span>
       </div>
-      <div class="tabBar-item" @click="jumpTo('/chat')">
-          <span class="iconfont" :class="{active:$route.path.includes('/chat')}">&#xe60f;</span>
-          <span :class="{active:$route.path.includes('/chat')}">聊天</span>
+      <div class="tabBar-item" @click="jumpTo('/cart')">
+          <span class="iconfont" :class="{active:$route.path.includes('/cart')}">&#xe673;</span>
+          <span :class="{active:$route.path.includes('/cart')}">购物车</span>
       </div>    
       <div class="tabBar-item" @click="jumpTo('/mine')">
           <span class="iconfont" :class="{active:$route.path.includes('/mine')}">&#xe608;</span>
