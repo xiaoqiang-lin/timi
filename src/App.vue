@@ -7,21 +7,31 @@
 
 <script>
   import TabBar from './components/TabBar/TabBar'
-  import { mapActions } from 'vuex'
+  import { mapActions,mapMutations,mapGetters} from 'vuex'
   export default {
     name: "App",
     components: {
       TabBar
     },
     created(){
-      this.syncUserInfo(JSON.parse(sessionStorage.getItem("userInfo")))
-      this.fetchUserInfo()
+      if(sessionStorage.getItem("userInfo")){
+        this.syncUserInfo(JSON.parse(sessionStorage.getItem("userInfo"))||{})
+        this.setLoginStatus(JSON.parse(sessionStorage.getItem("isLogin")))
+        this.setCartList(JSON.parse(sessionStorage.getItem("cartList"))||[])
+        this.fetchUserInfo()
+        this.fetchCartList()
+      }
     },
     methods:{
       ...mapActions([
         'syncUserInfo',
-        'fetchUserInfo'
-      ])
+        'fetchUserInfo',
+        'fetchCartList'
+      ]),
+      ...mapMutations({
+        'setLoginStatus':'SET_LOGIN_STATE',
+        'setCartList':'SET_CART_LIST'
+      })
     }
   }
 </script>

@@ -1,4 +1,5 @@
 export default {
   userInfo: {},
-  isLogin:false
+  isLogin:false,
+  cartList: []
 }

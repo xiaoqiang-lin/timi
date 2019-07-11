@@ -1,5 +1,6 @@
 <template>
-  <div class="chat">
+  <div style="width:100%;height:100%">
+    <div class="cart" v-if="isLogin" v-cloak>
     <header class="title">
       <button>
         <span class="iconfont">&#xe660;</span>
@@ -13,29 +14,27 @@
       <span class="iconfont">&#xe68b;</span>
       <span>您正在安全购物环境中，请放心购物</span>
     </div>
-    <div class="cart-list">
-      <div class="list-item" v-for="item in cartList" :key="item.goods_id">
-        <div class="goods-img-wrapper">
-          <span class="iconfont checkbox" style="font-size:24px">&#xe652;</span>
-          <img :src="item.goods_img" class="goods-img"> 
-        </div>
-        <div class="goods-editor-wrapper">
-          <a href="" class="goods-desc">{{item.goods_name}}</a>
-          <p class="goods-price">￥{{item.goods_price}}</p>
+    <div class="scroll-view">
+            <ul class="cart-list">
+      <del-slider v-for="(item,index) in cartList" :key="item.goods_id" class="list-item"
+      @delItem="delGoods(item,index)">
+          <div class="goods-img-wrapper" slot="img">
+            <span class="iconfont checkbox" style="font-size:24px">&#xe652;</span>
+            <img :src="item.goods_img" class="goods-img"> 
+          </div>
+          <div class="goods-editor-wrapper" slot="desc">
+            <a href="" class="goods-desc">{{item.goods_name}}</a>
+            <p class="goods-price">￥{{item.goods_price*item.goods_num}}</p>
           <div class="edit-bar">
             <div class="bar">
               <button style="font-size:18px">-</button>
               <input type="tel" v-model="item.goods_num">
               <button style="font-size:18px">+</button>
-            </div>
-            <button class="bin">
-              <span class="iconfont">
-                &#xe610;
-              </span>
-            </button>
+          </div>
           </div>
         </div>
-      </div>
+      </del-slider>
+    </ul>
     </div>
     <footer>
       <div class="wrapper">
@@ -48,35 +47,62 @@
       <button class="pay-btn">去结算</button>
     </footer>
   </div>
+  <un-login v-else v-cloak></un-login>
+  </div>
 </template>
 
 <script>
   import {getCartList} from 'dao/cart'
+  import DelSlider from 'components/DelSlider/DelSlider'
+  import UnLogin from '../Login/UnLogin'
+  import {mapGetters,mapActions} from 'vuex'
+  import BScroll from 'better-scroll'
   export default {
     name: "Cart",
     data(){
       return {
         isChecked:true,
-        cartList:[]
       }
     },
     methods:{
+      ...mapActions([
+        'fetchCartList',
+        'delCartGoods'
+      ]),
       switchState(bool){
         this.isChecked=bool
+      },
+      // async delGoods(item,index){
+      //   console.log(index)
+      //   await this.delCartGoods({goods_id:item.goods_id,user_id:item.user_id},index)
+      //   sessionStorage.setItem('cartList',JSON.stringify(this.cartList))
+      //   console.log(this.cartList[0])
+      // }
+      delGoods(item,index){
+        this.cartList = this.cartList.splice(index,1)
       }
     },
-    created(){
-      getCartList().then((val)=>{
-        this.cartList = val.data.message
-        console.log(this.cartList)
-      })
+    computed:{
+      ...mapGetters([
+        'isLogin',
+        'cartList'
+      ])
+    },
+    mounted(){
+      this.fetchCartList().then((val)=>{
+        sessionStorage.setItem('cartList',JSON.stringify(this.cartList))
+      }),
+      new BScroll('.scroll-view')
+    },
+    components:{
+      DelSlider,
+      UnLogin
     }
-
   }
 </script>
 
 <style scoped lang="stylus" ref="stylesheet/stylus">
-  .chat
+  .cart
     background-color #e0e0e0
     width 100%
     height 100%
@@ -91,6 +117,7 @@
       left: 0;
       top: 0;
       z-index 999
+      margin-top 0px
       border-bottom: 1px solid #e0e0e0;
       -webkit-background-size: 1px 44px;
       background-size: 1px 44px;
@@ -111,61 +138,66 @@
       .iconfont
         font-size 21px
         color green
-    .cart-list
-      margin-top 15px
-      background-color #fff
-      .list-item
-        display flex
-        justify-content center
-        align-items center
-        border-bottom 1px solid #e0e0e0
-        margin-top 5px
-        .goods-img-wrapper
+    .scroll-view
+      width 100%
+      height 100%
+      margin-bottom 95px
+      .cart-list
+        margin-top 15px
+        background-color #fff
+        overflow hidden
+        .list-item:last-child
+          margin-bottom 200px
+        .list-item
           display flex
           justify-content center
           align-items center
-          .checkbox
-            margin 0px 10px
-          .goods-img
-            height 100px
-            margin-right 10px
-        .goods-editor-wrapper
-          display flex
-          flex-direction column
-          justify-content center
-          .goods-desc
-            margin-top 5px
-            font-size 14px
-            color #666
-            line-height 20px
-            height 40px
-            overflow hidden
-            display block
-            text-decoration none
-          .goods-price
-            color #E9232C
-            margin-top 5px
-          .edit-bar
+          border-bottom 1px solid #e0e0e0
+          margin-top 5px
+          position: relative;
+          .goods-img-wrapper
             display flex
-            justify-content space-between
-            .bar
+            justify-content center
+            align-items center
+            .checkbox
+              margin 0px 10px
+            .goods-img
+              height 100px
+              margin-right 10px
+          .goods-editor-wrapper
+            display flex
+            flex-direction column
+            justify-content center       
+            .goods-desc
               margin-top 5px
-              border 1px solid #e0e0e0
-              text-align center
-              margin-bottom 10px
-              button
-                background transparent
-                border 1px
-              input
-                border none
-                border-left 1px solid #e0e0e0
-                border-right 1px solid #e0e0e0
-                width 50px
-                height 23px
+              font-size 14px
+              color #666
+              line-height 20px
+              height 40px
+              overflow hidden
+              display block
+              text-decoration none
+            .goods-price
+              color #E9232C
+              margin-top 5px
+            .edit-bar
+              display flex
+              justify-content space-between
+              .bar
+                margin-top 5px
+                border 1px solid #e0e0e0
                 text-align center
-            .bin
-              background transparent
-              border 1px
+                margin-bottom 10px
+                button
+                  background transparent
+                  border 1px solid #e0e0e0
+                input
+                  border none
+                  border-left 1px solid #e0e0e0
+                  border-right 1px solid #e0e0e0
+                  width 50px
+                  height 23px
+                  text-align center
     footer
       position: fixed
       left 0
@@ -194,4 +226,6 @@
         color #fff
         text-decoration none
         border none
+  [v-cloak]
+    display none !important
 </style>

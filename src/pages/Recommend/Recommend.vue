@@ -1,16 +1,20 @@
 <template>
-  <div class="recommend">
-    <ul>
-      <goods-showcase :item="item" v-for="(item,index) in goodsList" :key="item.goods_id+index" class="recommend-item"></goods-showcase>
-    </ul>
+  <div style="width:100%;height:100%">
+    <div class="recommend" v-if="isLogin" v-cloak>
+      <ul>
+        <goods-showcase :item="item" v-for="(item,index) in goodsList" :key="item.goods_id+index" class="recommend-item"></goods-showcase>
+      </ul>
+    </div>
+    <un-login v-else v-cloak></un-login>
   </div>
 </template>
 
 <script>
   import {getRecommendData} from 'dao/recommend'
   import GoodsShowcase from 'components/GoodsShowcase/GoodsShowcase'
-  import BScroll from 'better-scroll';
-  import {mapActions} from 'vuex'
+  import BScroll from 'better-scroll'
+  import UnLogin from '../Login/UnLogin'
+  import {mapActions,mapGetters} from 'vuex'
   export default {
     name: "Recommend",
     data(){
@@ -22,10 +26,11 @@
     },
     components: {
       GoodsShowcase,
+      UnLogin
     },
     mounted (){
       getRecommendData(this.page,this.count).then((val) => {
-        this.goodsList = val.data.message
+        this.goodsList = val.data.message;
       }),
       this.syncUserInfo(JSON.parse(sessionStorage.getItem("userInfo")))
     },
@@ -60,10 +65,14 @@
         this.$nextTick(() => {
           // 让当前的页码+1
           this.page += 1;
-          // 初始化
           this._initBScroll();
         })
       }
+    },
+    computed:{
+      ...mapGetters([
+        'isLogin'
+      ])
     }
 }
 </script>
@@ -80,4 +89,6 @@
       flex-wrap wrap
       background #F5F5F5
       padding-bottom 50px
+  [v-cloak]
+    display none !important
 </style>

@@ -52,7 +52,7 @@
 <script>
   import {logout} from 'dao/login'
   import {MessageBox} from 'mint-ui';
-  import {mapActions} from 'vuex'
+  import {mapActions,mapMutations} from 'vuex'
 
   export default {
     name: "Setting",
@@ -60,11 +60,21 @@
       ...mapActions([
         'signOut'
       ]),
+      ...mapMutations({
+        'setUserInfo':'SET_USER_INFO',
+        'setCartList':'SET_CART_LIST',
+        'setLoginState':'SET_LOGIN_STATE'
+      }),
       handleLogout(){
         MessageBox.confirm('您确定退出登录吗?').then(action => {
            if('confirm' === action){
                 // 退出登录
-                let result = this.signOut();
+                const {signOut} = this
+                let result = signOut().then(()=>{
+                  this.setLoginState(false)
+                  this.setUserInfo({})
+                  this.setCartList([])
+                })
                 // console.log(result);
                 // 回到主界面
                 // console.log('------------')

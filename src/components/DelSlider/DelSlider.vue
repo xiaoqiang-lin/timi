@@ -4,13 +4,12 @@
             <div class="content" @touchstart='touchStart' @touchmove='touchMove' @touchend='touchEnd' :style="deleteSlider">
                 <!-- 插槽中放具体项目中需要内容 -->
                 <slot name="img"></slot>
-                <slot name="title"></slot>
-                <slot name="price"></slot>
+                <slot name="desc"></slot>
                 <!-- 默认插槽 -->
                 <slot></slot>
             </div>
-            <div class="remove" ref='remove' @click="deleteLine">
-                删除
+            <div class="remove" ref='remove' @click="delItem()">
+                <i class="iconfont" style="font-size: 36px;">&#xe610;</i>
             </div>
         </div>
     </div>
@@ -76,13 +75,39 @@ export default {
                 }
             }
         },
-        deleteLine (){
+        delItem (){
             this.deleteSlider = "transform:translateX(0px)";
-            this.$emit('deleteLine');
+            this.$emit('delItem');
         }   
     }
 }
 </script>
 <style lang='stylus'  ref='stylesheet/stylus' scoped>
-
+.slider
+    width: 100%;
+    height: 120px;
+    position: relative;
+.content
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 100;
+    transition: 0.3s;
+    background-color: #fff;
+    height 100%
+    display flex
+.remove
+    display flex
+    justify-content center
+    align-items center
+    position: absolute;
+    width:100px;
+    height:100%
+    background-color: #f60;
+    right: 0;
+    top: 0;
+    color:#fff;
+    margin-bottom 2px
 </style>

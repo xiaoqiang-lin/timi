@@ -2000,6 +2000,14 @@ body:hover > * {
 
 
 
+## 六、实现购物车功能
+
+1.
+
+2. 删除商品
+
+   
+
 ## 参考链接
 
 [在vue项目中使用iconfont ](https://www.imooc.com/article/33597?block_id=tuijian_wz)

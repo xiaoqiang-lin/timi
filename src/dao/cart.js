@@ -10,3 +10,7 @@ export function getCartList () {
 export function addGoodsToCart(params){
     return axios.post(BASE_URL + '/api/addtocart',params);
 }
+
+export function delGoodsFromCart(params){
+    return axios.post(BASE_URL+'/api/delcartgoods',params)
+}

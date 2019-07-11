@@ -10,6 +10,7 @@
 
 <script>
 export default {
+  name:'UnLogin',
   data () {
     return {
     };

@@ -16,8 +16,8 @@
 
 <script>
 import {addGoodsToCart} from 'dao/cart';
-import {mapGetters} from 'vuex'
-
+import {mapGetters,mapActions} from 'vuex'
+import {Toast} from 'mint-ui';
 export default {
   name: 'GoodsShowcase',
   data () {
@@ -29,13 +29,22 @@ export default {
   },
   computed:{
     ...mapGetters([
+      'cartList',
       'userInfo'
     ])
   },
   methods: {
-    async clickHandler(item) {
-      let result = await addGoodsToCart({user_id:this.userInfo.id,goods_id:item.goods_id,goods_name:item.goods_name, goods_img:item.thumb_url, goods_price:item.price});
-      console.log(result);
+    ...mapActions([
+      'addCartGoods',
+    ]),
+  async clickHandler(item) {
+      await this.addCartGoods({user_id:this.userInfo.id,goods_id:item.goods_id,goods_name:item.goods_name, goods_img:item.thumb_url, goods_price:item.price});
+      Toast({
+            message: '成功加入购物车',
+            position: 'center',
+            duration: 500
+      });
+      console.log(this.cartList.length)
     }
   }
 }
