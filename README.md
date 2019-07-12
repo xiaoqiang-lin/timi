@@ -2006,9 +2006,66 @@ body:hover > * {
 
 2. 删除商品
 
-   
+   ①首先修改`UI`界面层，然后再发送网络请求；修改数据库中的数据
+
+使用`vuex`进行全局状态管理
+
+```javascript
+delGoods(item,index){
+    this.cartList = this.cartList.splice(index,1)
+}
+```
+
+```javascript
+  [types.DEL_CART_GOODS](state,index){
+    state.cartList = state.cartList.splice(index,1)
+  }
+
+...mapMutations({
+    'removeCartGoods':'DEL_CART_GOODS'
+}),
+delGoods(item,index){
+    this.removeCartGoods(index)
+}
+```
+
+
+
+关于计算属性
+
+```javascript
+    computed:{
+      ...mapGetters([
+        'isLogin',
+        'cartList'
+      ]),
+      checkAllFlag(){
+       return this.checkNum === this.cartList.length
+      },
+      checkNum(){
+        let i = 0
+        this.cartList.forEach((item)=>{
+          if(item.isChecked){
+            i ++;
+          }
+        })
+        return i
+      }
+    },
+toogleCheckAll(){
+        this.checkAllFlag = !this.checkAllFlag
+        this.cartList.forEach((item)=>{
+          item.isChecked = this.checkAllFlag
+        })
+        this.checkAllCartGoods({user_id:this.cartList[0].user_id,checkAllFlag:this.checkAllFlag})
+      }
+```
+
+
 
 ## 参考链接
+
+
 
 [在vue项目中使用iconfont ](https://www.imooc.com/article/33597?block_id=tuijian_wz)
 

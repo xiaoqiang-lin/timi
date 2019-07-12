@@ -8,7 +8,7 @@
                 <!-- 默认插槽 -->
                 <slot></slot>
             </div>
-            <div class="remove" ref='remove' @click="delItem()">
+            <div class="remove" ref='remove' @click="delItem">
                 <i class="iconfont" style="font-size: 36px;">&#xe610;</i>
             </div>
         </div>

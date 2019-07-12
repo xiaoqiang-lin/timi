@@ -26,7 +26,7 @@ const mutations = {
     }
   },
   [types.DEL_CART_GOODS](state,index){
-    state.cartList = state.cartList.splice(index,1)
+    state.cartList.splice(index,1)
   }
 }
 

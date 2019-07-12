@@ -19,7 +19,7 @@
       <del-slider v-for="(item,index) in cartList" :key="item.goods_id" class="list-item"
       @delItem="delGoods(item,index)">
           <div class="goods-img-wrapper" slot="img">
-            <span class="iconfont checkbox" style="font-size:24px">&#xe652;</span>
+            <span class="iconfont checkbox" :style="item.isChecked?'color:#E9232C':''" v-html="item.isChecked?'&#xe646;':'&#xe652;'" @click="editGoods('check',item)"></span>
             <img :src="item.goods_img" class="goods-img"> 
           </div>
           <div class="goods-editor-wrapper" slot="desc">
@@ -27,9 +27,9 @@
             <p class="goods-price">￥{{item.goods_price*item.goods_num}}</p>
           <div class="edit-bar">
             <div class="bar">
-              <button style="font-size:18px">-</button>
+              <button style="font-size:22px" @click="editGoods('minus',item)">-</button>
               <input type="tel" v-model="item.goods_num">
-              <button style="font-size:18px">+</button>
+              <button style="font-size:22px" @click="editGoods('add',item)">+</button>
           </div>
           </div>
         </div>
@@ -38,11 +38,10 @@
     </div>
     <footer>
       <div class="wrapper">
-        <span class="iconfont checkbox" style="font-size:24px;margin-left:10px;color:#E9232C" v-show="isChecked" @click="switchState(true)">&#xe646;</span>
-        <span class="iconfont checkbox" style="font-size:24px;margin-left:10px" v-show="!isChecked" @click="switchState(false)">&#xe652;</span>
+        <span class="iconfont checkbox" :style="checkAllFlag?'color:#E9232C':''" v-html="checkAllFlag?'&#xe646;':'&#xe652;'" @click="toogleCheckAll()"></span>
         <span class="select-all-btn" style="margin-right:10px">全选</span>
         <span>合计:</span>
-        <span class="goods-price">￥5999</span>
+        <span class="goods-price">￥{{totalPrice}}</span>
       </div>
       <button class="pay-btn">去结算</button>
     </footer>
@@ -55,38 +54,79 @@
   import {getCartList} from 'dao/cart'
   import DelSlider from 'components/DelSlider/DelSlider'
   import UnLogin from '../Login/UnLogin'
-  import {mapGetters,mapActions} from 'vuex'
+  import {mapGetters,mapActions,mapMutations} from 'vuex'
   import BScroll from 'better-scroll'
   export default {
     name: "Cart",
     data(){
       return {
-        isChecked:true,
       }
     },
     methods:{
       ...mapActions([
         'fetchCartList',
-        'delCartGoods'
+        'delCartGoods',
+        'editCartGoods',
+        'checkAllCartGoods'
       ]),
-      switchState(bool){
-        this.isChecked=bool
-      },
-      // async delGoods(item,index){
-      //   console.log(index)
-      //   await this.delCartGoods({goods_id:item.goods_id,user_id:item.user_id},index)
-      //   sessionStorage.setItem('cartList',JSON.stringify(this.cartList))
-      //   console.log(this.cartList[0])
-      // }
+      ...mapMutations({
+        'removeCartGoods':'DEL_CART_GOODS'
+      }),
       delGoods(item,index){
-        this.cartList = this.cartList.splice(index,1)
+        this.removeCartGoods(index)
+        this.delCartGoods({goods_id:item.goods_id,user_id:item.user_id})
+        sessionStorage.setItem('cartList',JSON.stringify(this.cartList))
+      },
+      editGoods(flag,item){
+        if(flag==='minus'){
+          if(item.goods_num<=1){
+            return;
+          }
+          item.goods_num --;
+        }else if(flag==='add'){
+          item.goods_num ++;
+        }else{
+          item.isChecked = item.isChecked === 1 ? 0 : 1
+        }
+        this.editCartGoods({user_id:item.user_id,goods_id:item.goods_id,goods_num:item.goods_num,isChecked:item.isChecked})
+        sessionStorage.setItem('cartList',JSON.stringify(this.cartList))
+      },
+      toogleCheckAll(){
+        let flag = !this.checkAllFlag
+        this.cartList.forEach((item)=>{
+          // item.isChecked = this.checkAllFlag
+          item.isChecked = flag
+        })
+        this.checkAllCartGoods({user_id:this.cartList[0].user_id,flag:flag})
+        sessionStorage.setItem('cartList',JSON.stringify(this.cartList))
       }
     },
     computed:{
       ...mapGetters([
         'isLogin',
         'cartList'
-      ])
+      ]),
+      checkAllFlag(){
+       return this.checkNum === this.cartList.length
+      },
+      checkNum(){
+        let i = 0
+        this.cartList.forEach((item)=>{
+          if(item.isChecked){
+            i ++;
+          }
+        })
+        return i
+      },
+      totalPrice(){
+        let money = 0
+        this.cartList.forEach((item)=>{
+          if(item.isChecked){
+            money += parseInt(item.goods_price) * parseInt(item.goods_num)
+          }
+        })
+        return money
+      }
     },
     mounted(){
       this.fetchCartList().then((val)=>{
@@ -144,11 +184,12 @@
       margin-bottom 95px
       .cart-list
         margin-top 15px
-        background-color #fff
+        background-color #e0e0e0
         overflow hidden
         .list-item:last-child
           margin-bottom 200px
         .list-item
+          background-color #fff
           display flex
           justify-content center
           align-items center
@@ -160,7 +201,8 @@
             justify-content center
             align-items center
             .checkbox
-              margin 0px 10px
+              font-size:24px
+              margin:0 10px
             .goods-img
               height 100px
               margin-right 10px

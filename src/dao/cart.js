@@ -14,3 +14,9 @@ export function addGoodsToCart(params){
 export function delGoodsFromCart(params){
     return axios.post(BASE_URL+'/api/delcartgoods',params)
 }
+export function editGoodsInCart(params){
+    return axios.post(BASE_URL+'/api/editcartgoods',params)
+}
+export function checkAllGoodsInCart(params){
+    return axios.post(BASE_URL+'/api/checkallgoods',params)
+}
